@@ -1,7 +1,7 @@
 import java.util.*;
+import java.awt.Point;
 
 public class AStarPathFinder {
-
     private int[][] grid;
     private int rows, cols;
 
@@ -38,7 +38,7 @@ public class AStarPathFinder {
     public double manhattanHeuristic(Point a, Point b) {
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
-
+    
     // Alternative heuristic: Euclidean distance
     public double euclideanHeuristic(Point a, Point b) {
         return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
@@ -47,6 +47,8 @@ public class AStarPathFinder {
     // Find path from start to goal using the A* algorithm.
     // You can switch the heuristic function here if desired.
     public List<Point> findPath(Point start, Point goal) {
+        long startTime = System.nanoTime(); // Start measuring execution time
+        
         PriorityQueue<Node> openSet = new PriorityQueue<>();
         boolean[][] closedSet = new boolean[rows][cols];
 
@@ -57,8 +59,14 @@ public class AStarPathFinder {
             Node current = openSet.poll();
 
             // Goal check
-            if (current.point.x == goal.x && current.point.y == goal.y) {
-                return reconstructPath(current);
+            if (current.point.equals(goal)) {
+                long endTime = System.nanoTime(); // End measuring execution time
+                List<Point> path = reconstructPath(current);
+                
+                System.out.println("Execution Time (ms): " + (endTime - startTime) / 1e6); // Print execution time
+                System.out.println("Path Length: " + path.size()); // Print path length
+                System.out.println("Optimal Path: " + path); // Print the optimal path
+                return path;
             }
 
             closedSet[current.point.x][current.point.y] = true;
@@ -89,6 +97,7 @@ public class AStarPathFinder {
             }
         }
         // No path found
+        System.out.println("No path found.");
         return new ArrayList<>();
     }
 
@@ -100,5 +109,18 @@ public class AStarPathFinder {
             node = node.parent;
         }
         return path;
+    }
+
+    // Performance Metrics (Use this to measure scalability with increasing number of robots)
+    public void evaluatePerformance(int numRobots, int complexity, long executionTime, int pathLength) {
+        System.out.println("Evaluating performance...");
+        System.out.println("Number of Robots: " + numRobots);
+        System.out.println("Environment Complexity: " + complexity);
+        System.out.println("Average Execution Time (s): " + executionTime / 1e9);
+        System.out.println("Average Path Length: " + pathLength);
+        
+        // How often robots take redundant paths (efficiency of communication, redundant paths)
+        double redundancyFactor = (numRobots * pathLength) / (double) (rows * cols);
+        System.out.println("Redundancy Factor: " + redundancyFactor);
     }
 }

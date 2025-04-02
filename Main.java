@@ -7,19 +7,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+// Class representing a coordinate point on a grid
 class Point {
-    int x, y;
+    int x, y;    // x and y coordinates of the point
 
     public Point(int x, int y) {
         this.x = x;
         this.y = y;
     }
-
+    
+    // Returns a string representation of the point
     @Override
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
 
+    
+    // Checks if two points are equal based on their coordinates
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -31,12 +35,13 @@ class Point {
     }
 }
 
+// Class representing a Robot with its own position, known grid, and peers
 class Robot {
-    Point position;
-    int[][] knownGrid;
-    List<Robot> peers;
-    Color color;
-    List<Point> currentPath;
+    Point position; // Current position of the robot
+    int[][] knownGrid; // The grid known by the robot
+    List<Robot> peers; // Other robots in the simulation
+    Color color; // Color of the robot, used for GUI representation
+    List<Point> currentPath; // Current path the robot is following
 
     public Robot(int x, int y, int[][] grid, Color color) {
         position = new Point(x, y);
@@ -48,11 +53,13 @@ class Robot {
         this.color = color;
         this.currentPath = new ArrayList<>();
     }
-
+    
+    // Sets the list of peer robots
     public void setPeers(List<Robot> peers) {
         this.peers = peers;
     }
 
+    // Communicates the presence of an obstacle to other robots
     public void communicateObstacleData(int x, int y) {
         for (Robot robot : peers) {
             if (robot != this) {
@@ -61,10 +68,12 @@ class Robot {
         }
     }
 
+    // Updates the robot's known grid with new data
     public void updateKnownGrid(int x, int y, int value) {
         knownGrid[x][y] = value;
     }
 
+    // Moves the robot to a new point if valid
     public void move(Point nextStep) {
         if (isValidMove(nextStep)) {
             position = nextStep;
@@ -74,11 +83,13 @@ class Robot {
             }
         }
     }
-
+    
+    // Checks if the robot can move to a specified point
     public boolean canMoveTo(Point nextStep) {
         return isValidMove(nextStep);
     }
 
+    // Helper method to determine if a move is valid based on the known grid
     private boolean isValidMove(Point p) {
         if (p.x < 0 || p.x >= knownGrid.length || p.y < 0 || p.y >= knownGrid[0].length) {
             return false;
@@ -87,6 +98,7 @@ class Robot {
     }
 }
 
+// Class for finding paths using the A* pathfinding algorithm
 class AStarPathFinder {
     private int[][] grid;
     private int rows, cols;
@@ -102,9 +114,9 @@ class AStarPathFinder {
     private class Node implements Comparable<Node> {
         Point point;
         Node parent;
-        double g;
-        double h;
-        double f;
+        double g; // Cost from the start node
+        double h; // Heuristic cost to the goal
+        double f; // Total cost (g + h)
 
         public Node(Point point, Node parent, double g, double h) {
             this.point = point;
@@ -119,11 +131,13 @@ class AStarPathFinder {
             return Double.compare(this.f, other.f);
         }
     }
-
+    
+    // Heuristic function using the Manhattan distance
     public double manhattanHeuristic(Point a, Point b) {
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 
+    // Method to find the optimal path from start to goal using A*
     public List<Point> findPath(Point start, Point goal) {
         long startTime = System.nanoTime();
         PriorityQueue<Node> openSet = new PriorityQueue<>();
@@ -171,6 +185,7 @@ class AStarPathFinder {
         return new ArrayList<>();
     }
 
+    // Reconstructs the path from the goal to the start using parent links
     private List<Point> reconstructPath(Node node) {
         List<Point> path = new ArrayList<>();
         while (node != null) {
@@ -181,6 +196,7 @@ class AStarPathFinder {
     }
 }
 
+// Class coordinating multiple robots in a collaborative simulation
 class CollaborativeRobotCoordinator {
     private int[][] grid;
     private List<Robot> robots;
@@ -197,6 +213,7 @@ class CollaborativeRobotCoordinator {
         }
     }
 
+    // Steps the simulation, returning true if not all robots are at the rendezvous
     public boolean stepSimulation() {
         boolean allAtRendezvous = true;
         for (Robot robot : robots) {
@@ -222,6 +239,7 @@ class CollaborativeRobotCoordinator {
         return !allAtRendezvous;
     }
 
+    // Runs the entire simulation until all robots reach the rendezvous
     public void runSimulation() {
         long totalStartTime = System.nanoTime(); // Start timing the entire simulation
 

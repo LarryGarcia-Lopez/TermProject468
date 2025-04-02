@@ -43,10 +43,10 @@ Example:
 
 Running the Simulation
 1. Compile the Java program:
-- javac Main.java
+  javac Main.java
 
 2. Run the program:
-java Main
+  java Main
 
 The program reads the grid configuration from Environment.txt, initializes the simulation,
 and displays the moves of each robot step-by-step in the console. The output includes each
